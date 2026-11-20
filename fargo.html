@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fargo (1996) — Quote Generator</title>
+    <style>
+        /* Extremely minimal, clean typography and layout */
+        :root {
+            --bg-color: #fafafa;
+            --text-color: #1a1a1a;
+            --muted-color: #595959;
+            --border-color: #dcdcdc;
+            --button-bg: #1a1a1a;
+            --button-text: #ffffff;
+            --button-hover: #383838;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-color: #141414;
+                --text-color: #ededed;
+                --muted-color: #a0a0a0;
+                --border-color: #2e2e2e;
+                --button-bg: #ededed;
+                --button-text: #141414;
+                --button-hover: #cccccc;
+            }
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 2rem 1.5rem;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            justify-content: center;
+            align-items: center;
+        }
+
+        main {
+            width: 100%;
+            max-width: 36rem;
+        }
+
+        header {
+            margin-bottom: 2.5rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.75rem;
+        }
+
+        h1 {
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--muted-color);
+            margin: 0;
+        }
+
+        figure {
+            margin: 0 0 2.5rem 0;
+            min-height: 8rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        blockquote {
+            margin: 0 0 1rem 0;
+            font-size: 1.375rem;
+            font-weight: 400;
+            letter-spacing: -0.01em;
+        }
+
+        figcaption {
+            font-size: 0.95rem;
+            color: var(--muted-color);
+        }
+
+        button {
+            appearance: none;
+            background-color: var(--button-bg);
+            color: var(--button-text);
+            border: none;
+            border-radius: 4px;
+            padding: 0.75rem 1.25rem;
+            font-size: 0.95rem;
+            font-family: inherit;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.15s ease, transform 0.05s ease;
+        }
+
+        button:hover {
+            background-color: var(--button-hover);
+        }
+
+        button:active {
+            transform: translateY(1px);
+        }
+
+        button:focus-visible {
+            outline: 2px solid var(--text-color);
+            outline-offset: 3px;
+        }
+
+        @media (max-width: 480px) {
+            blockquote {
+                font-size: 1.2rem;
+            }
+            button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <main>
+        <header>
+            <h1>Fargo (1996)</h1>
+        </header>
+
+        <figure aria-live="polite">
+            <blockquote id="quote-text"></blockquote>
+            <figcaption id="quote-author"></figcaption>
+        </figure>
+
+        <button id="new-quote-btn" type="button">New Quote</button>
+    </main>
+
+    <script>
+        // Collection of memorable quotes from Fargo (1996)
+        const quotes = [
+            {
+                text: "And for what? For a little bit of money. There's more to life than a little money, you know. Don't you know that? And here ya are, and it's a beautiful day. Well, I just don't understand it.",
+                author: "Marge Gunderson"
+            },
+            {
+                text: "Oh, yah? You betcha.",
+                author: "Marge Gunderson"
+            },
+            {
+                text: "I'm not sure I agree with you a hundred percent on your police work, there, Lou.",
+                author: "Marge Gunderson"
+            },
+            {
+                text: "Hon, you got Arby's all over me.",
+                author: "Marge Gunderson"
+            },
+            {
+                text: "Heck, Norm, you know we're doin' pretty good.",
+                author: "Marge Gunderson"
+            },
+            {
+                text: "We're not a bank, Jerry.",
+                author: "Wade Gustafson"
+            },
+            {
+                text: "Well, heck, if you wanna play games here! I'm workin' with ya on this thing, but I—okay, lookit, I'm hangin' up!",
+                author: "Jerry Lundegaard"
+            },
+            {
+                text: "You're darn tootin'!",
+                author: "Jerry Lundegaard"
+            },
+            {
+                text: "Yeah, but that TruCoat—you don't get it, you get oxidation problems. It'll cost you a heck of a lot more than $500.",
+                author: "Jerry Lundegaard"
+            },
+            {
+                text: "I'm cooperating here!",
+                author: "Jerry Lundegaard"
+            },
+            {
+                text: "Oh, jeez!",
+                author: "Jerry Lundegaard"
+            },
+            {
+                text: "We're gonna stop at Pancakes House.",
+                author: "Gaear Grimsrud"
+            },
+            {
+                text: "I'm not gonna debate you, Jerry. I'm not gonna sit here and debate.",
+                author: "Carl Showalter"
+            },
+            {
+                text: "You should see the other guy.",
+                author: "Carl Showalter"
+            },
+            {
+                text: "Look, we had a deal here. A deal's a deal.",
+                author: "Carl Showalter"
+            },
+            {
+                text: "No, no, I'm not—I'm not a—I'm just a—you know, I'm just a regular guy.",
+                author: "Carl Showalter"
+            },
+            {
+                text: "You're such a super lady! And I'm so lonely.",
+                author: "Mike Yanagita"
+            },
+            {
+                text: "Well, he was kinda funny-lookin'. More than most people even.",
+                author: "Prostitute (Escort)"
+            },
+            {
+                text: "Oh, I just think I'm gonna barf!",
+                author: "Marge Gunderson"
+            },
+            {
+                text: "Two cents? No, sir, three-cent stamp.",
+                author: "Norm Gunderson"
+            }
+        ];
+
+        const quoteTextEl = document.getElementById("quote-text");
+        const quoteAuthorEl = document.getElementById("quote-author");
+        const newQuoteBtn = document.getElementById("new-quote-btn");
+
+        let currentIndex = -1;
+
+        /**
+         * Selects and displays a random quote, ensuring it differs
+         * from the currently displayed quote.
+         */
+        function displayRandomQuote() {
+            try {
+                if (!quotes.length) return;
+
+                let nextIndex;
+                do {
+                    nextIndex = Math.floor(Math.random() * quotes.length);
+                } while (nextIndex === currentIndex && quotes.length > 1);
+
+                currentIndex = nextIndex;
+                const selected = quotes[currentIndex];
+
+                quoteTextEl.textContent = `“${selected.text}”`;
+                quoteAuthorEl.textContent = `— ${selected.author}`;
+            } catch (error) {
+                console.error("Failed to render quote:", error);
+                quoteTextEl.textContent = "Unable to load quote.";
+                quoteAuthorEl.textContent = "";
+            }
+        }
+
+        // Event listener for button interaction
+        newQuoteBtn.addEventListener("click", displayRandomQuote);
+
+        // Display an initial quote on page load
+        window.addEventListener("DOMContentLoaded", displayRandomQuote);
+    </script>
+</body>
+</html>
