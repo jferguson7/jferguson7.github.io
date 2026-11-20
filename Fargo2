@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fargo (1996) — Quote Generator</title>
+    <style>
+        /* Clean, minimal variables with explicit light & dark theme support */
+        :root {
+            --bg-color: #f4f6f8;
+            --card-bg: rgba(250, 250, 250, 0.85);
+            --text-color: #181a1b;
+            --muted-color: #525860;
+            --border-color: #d4d9df;
+            --button-bg: #181a1b;
+            --button-text: #ffffff;
+            --button-hover: #363a3e;
+            --sky-top: #dce4ec;
+            --sky-bottom: #f4f6f8;
+            --snow-hill: #e4eaf0;
+            --snow-ground: #edf1f5;
+            --silhouette: #6c7a89;
+            --accent-red: #b83227;
+            --toggle-track: #cfd6de;
+            --toggle-knob: #ffffff;
+        }
+
+        html.dark {
+            --bg-color: #0f1216;
+            --card-bg: rgba(20, 24, 30, 0.85);
+            --text-color: #eef1f5;
+            --muted-color: #9aa4b0;
+            --border-color: #28303a;
+            --button-bg: #eef1f5;
+            --button-text: #0f1216;
+            --button-hover: #cfd6de;
+            --sky-top: #090c10;
+            --sky-bottom: #161d26;
+            --snow-hill: #1c2430;
+            --snow-ground: #141a22;
+            --silhouette: #3d4b5c;
+            --accent-red: #d94336;
+            --toggle-track: #34404e;
+            --toggle-knob: #eef1f5;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 2rem 1.5rem;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow-x: hidden;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        /* Full-bleed scenic Fargo SVG background */
+        .bg-scene {
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+            opacity: 0.55;
+            transition: opacity 0.3s ease;
+        }
+
+        html.dark .bg-scene {
+            opacity: 0.45;
+        }
+
+        /* Top-right dark mode toggle slider */
+        .theme-control {
+            position: fixed;
+            top: 1.25rem;
+            right: 1.25rem;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.8rem;
+            color: var(--muted-color);
+            user-select: none;
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 2.75rem;
+            height: 1.5rem;
+            cursor: pointer;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            inset: 0;
+            background-color: var(--toggle-track);
+            border-radius: 999px;
+            transition: background-color 0.25s ease;
+        }
+
+        .slider::before {
+            content: "";
+            position: absolute;
+            height: 1.125rem;
+            width: 1.125rem;
+            left: 0.1875rem;
+            bottom: 0.1875rem;
+            background-color: var(--toggle-knob);
+            border-radius: 50%;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+            transition: transform 0.25s ease, background-color 0.25s ease;
+        }
+
+        .switch input:checked + .slider::before {
+            transform: translateX(1.25rem);
+        }
+
+        .switch input:focus-visible + .slider {
+            outline: 2px solid var(--text-color);
+            outline-offset: 2px;
+        }
+
+        main {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 36rem;
+            background-color: var(--card-bg);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            padding: 2rem;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+        }
+
+        header {
+            margin-bottom: 2rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.75rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        h1 {
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--muted-color);
+            margin: 0;
+        }
+
+        .subtitle {
+            font-size: 0.75rem;
+            color: var(--muted-color);
+        }
+
+        figure {
+            margin: 0 0 2rem 0;
+            min-height: 8.5rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        blockquote {
+            margin: 0 0 1rem 0;
+            font-size: 1.35rem;
+            font-weight: 400;
+            letter-spacing: -0.01em;
+        }
+
+        figcaption {
+            font-size: 0.95rem;
+            color: var(--muted-color);
+        }
+
+        button {
+            appearance: none;
+            background-color: var(--button-bg);
+            color: var(--button-text);
+            border: none;
+            border-radius: 4px;
+            padding: 0.75rem 1.25rem;
+            font-size: 0.95rem;
+            font-family: inherit;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.15s ease, color 0.3s ease, transform 0.05s ease;
+        }
+
+        button:hover {
+            background-color: var(--button-hover);
+        }
+
+        button:active {
+            transform: translateY(1px);
+        }
+
+        button:focus-visible {
+            outline: 2px solid var(--text-color);
+            outline-offset: 3px;
+        }
+
+        @media (max-width: 480px) {
+            main {
+                padding: 1.5rem;
+            }
+            blockquote {
+                font-size: 1.15rem;
+            }
+            button {
+                width: 100%;
+            }
+        }
+    </style>
+    <script>
+        // Apply saved or system dark mode preference immediately to avoid flash
+        (function () {
+            try {
+                const savedTheme = localStorage.getItem("fargo-theme");
+                const prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+                if (savedTheme === "dark" || (!savedTheme && prefersDark)) {
+                    document.documentElement.classList.add("dark");
+                }
+            } catch (e) {
+                // Ignore storage access errors
+            }
+        })();
+    </script>
+</head>
+<body>
+    <!-- Scenic Brainerd, Minnesota winter illustration with Paul Bunyan statue & snowy highway -->
+    <svg class="bg-scene" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+        <defs>
+            <linearGradient id="winter-sky" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="var(--sky-top)" />
+                <stop offset="100%" stop-color="var(--sky-bottom)" />
+            </linearGradient>
+        </defs>
+
+        <!-- Sky -->
+        <rect width="1440" height="900" fill="url(#winter-sky)" />
+
+        <!-- Subtle Snowflakes -->
+        <g fill="var(--silhouette)" opacity="0.35">
+            <circle cx="140" cy="120" r="3" />
+            <circle cx="310" cy="210" r="2.5" />
+            <circle cx="480" cy="95" r="3.5" />
+            <circle cx="670" cy="180" r="2" />
+            <circle cx="890" cy="130" r="3" />
+            <circle cx="1080" cy="230" r="2.5" />
+            <circle cx="1260" cy="110" r="3.5" />
+            <circle cx="220" cy="340" r="2" />
+            <circle cx="540" cy="310" r="2.5" />
+            <circle cx="960" cy="290" r="2" />
+            <circle cx="1340" cy="320" r="3" />
+        </g>
+
+        <!-- Distant Rolling Snow Drifts -->
+        <path d="M0,610 Q360,545 720,600 T1440,575 L1440,900 L0,900 Z" fill="var(--snow-hill)" />
+
+        <!-- Pine Tree Line -->
+        <g fill="var(--silhouette)" opacity="0.45">
+            <polygon points="90,610 115,515 140,610" />
+            <polygon points="125,610 145,535 165,610" />
+            <polygon points="410,595 430,520 450,595" />
+            <polygon points="980,590 1005,495 1030,590" />
+            <polygon points="1020,595 1040,525 1060,595" />
+            <polygon points="1310,590 1335,500 1360,590" />
+        </g>
+
+        <!-- Iconic Paul Bunyan Statue Silhouette (Brainerd, MN) -->
+        <g transform="translate(220, 385)">
+            <!-- Pedestal -->
+            <rect x="26" y="192" width="48" height="26" rx="2" fill="var(--silhouette)" opacity="0.7" />
+            <!-- Boots & Legs -->
+            <rect x="34" y="142" width="13" height="50" fill="var(--silhouette)" opacity="0.8" />
+            <rect x="53" y="142" width="13" height="50" fill="var(--silhouette)" opacity="0.8" />
+            <!-- Iconic Red Buffalo Plaid Shirt Torso -->
+            <rect x="28" y="84" width="44" height="60" rx="6" fill="var(--accent-red)" opacity="0.7" />
+            <!-- Raised Waving Arm -->
+            <path d="M28,94 L8,64 L18,56 L34,84 Z" fill="var(--accent-red)" opacity="0.7" />
+            <!-- Axe Arm & Handle -->
+            <path d="M72,94 L86,132 L76,136 L66,102 Z" fill="var(--accent-red)" opacity="0.7" />
+            <rect x="81" y="72" width="4" height="120" fill="var(--silhouette)" opacity="0.8" />
+            <path d="M85,74 L103,68 L103,88 L85,82 Z" fill="var(--silhouette)" opacity="0.85" />
+            <!-- Head, Beard & Knit Beanie -->
+            <circle cx="50" cy="64" r="16" fill="var(--silhouette)" opacity="0.85" />
+            <path d="M34,66 Q50,86 66,66 Z" fill="var(--silhouette)" opacity="0.9" />
+            <path d="M35,56 Q50,36 65,56 Z" fill="var(--accent-red)" opacity="0.8" />
+            <circle cx="50" cy="43" r="4.5" fill="var(--snow-ground)" />
+        </g>
+
+        <!-- Foreground Snow Field -->
+        <path d="M0,650 Q520,625 960,655 T1440,640 L1440,900 L0,900 Z" fill="var(--snow-ground)" />
+
+        <!-- Empty Minnesota Highway Disappearing into the Horizon -->
+        <polygon points="695,643 725,643 960,900 460,900" fill="var(--silhouette)" opacity="0.22" />
+        <line x1="710" y1="643" x2="710" y2="900" stroke="var(--snow-ground)" stroke-width="4" stroke-dasharray="18 22" opacity="0.85" />
+    </svg>
+
+    <!-- Dark Mode Toggle Slider -->
+    <div class="theme-control">
+        <span id="theme-label">Dark mode</span>
+        <label class="switch" aria-label="Toggle dark mode">
+            <input type="checkbox" id="dark-mode-toggle">
+            <span class="slider"></span>
+        </label>
+    </div>
+
+    <main>
+        <header>
+            <h1>Fargo (1996)</h1>
+            <span class="subtitle">Brainerd, MN</span>
+        </header>
+
+        <figure aria-live="polite">
+            <blockquote id="quote-text"></blockquote>
+            <figcaption id="quote-author"></figcaption>
+        </figure>
+
+        <button id="new-quote-btn" type="button">New Quote</button>
+    </main>
+
+    <script>
+        // Collection of 20 memorable quotes from Fargo (1996)
+        const quotes = [
+            {
+                text: "And for what? For a little bit of money. There's more to life than a little money, you know. Don't you know that? And here ya are, and it's a beautiful day. Well, I just don't understand it.",
+                author: "Marge Gunderson"
+            },
+            {
+                text: "Oh, yah? You betcha.",
+                author: "Marge Gunderson"
+            },
+            {
+                text: "I'm not sure I agree with you a hundred percent on your police work, there, Lou.",
+                author: "Marge Gunderson"
+            },
+            {
+                text: "Hon, you got Arby's all over me.",
+                author: "Marge Gunderson"
+            },
+            {
+                text: "Heck, Norm, you know we're doin' pretty good.",
+                author: "Marge Gunderson"
+            },
+            {
+                text: "We're not a bank, Jerry.",
+                author: "Wade Gustafson"
+            },
+            {
+                text: "Well, heck, if you wanna play games here! I'm workin' with ya on this thing, but I—okay, lookit, I'm hangin' up!",
+                author: "Jerry Lundegaard"
+            },
+            {
+                text: "You're darn tootin'!",
+                author: "Jerry Lundegaard"
+            },
+            {
+                text: "Yeah, but that TruCoat—you don't get it, you get oxidation problems. It'll cost you a heck of a lot more than $500.",
+                author: "Jerry Lundegaard"
+            },
+            {
+                text: "I'm cooperating here!",
+                author: "Jerry Lundegaard"
+            },
+            {
+                text: "Oh, jeez!",
+                author: "Jerry Lundegaard"
+            },
+            {
+                text: "We're gonna stop at Pancakes House.",
+                author: "Gaear Grimsrud"
+            },
+            {
+                text: "I'm not gonna debate you, Jerry. I'm not gonna sit here and debate.",
+                author: "Carl Showalter"
+            },
+            {
+                text: "You should see the other guy.",
+                author: "Carl Showalter"
+            },
+            {
+                text: "Look, we had a deal here. A deal's a deal.",
+                author: "Carl Showalter"
+            },
+            {
+                text: "No, no, I'm not—I'm not a—I'm just a—you know, I'm just a regular guy.",
+                author: "Carl Showalter"
+            },
+            {
+                text: "You're such a super lady! And I'm so lonely.",
+                author: "Mike Yanagita"
+            },
+            {
+                text: "Well, he was kinda funny-lookin'. More than most people even.",
+                author: "Prostitute (Escort)"
+            },
+            {
+                text: "Oh, I just think I'm gonna barf!",
+                author: "Marge Gunderson"
+            },
+            {
+                text: "Two cents? No, sir, three-cent stamp.",
+                author: "Norm Gunderson"
+            }
+        ];
+
+        const quoteTextEl = document.getElementById("quote-text");
+        const quoteAuthorEl = document.getElementById("quote-author");
+        const newQuoteBtn = document.getElementById("new-quote-btn");
+        const darkModeToggle = document.getElementById("dark-mode-toggle");
+
+        let currentIndex = -1;
+
+        /**
+         * Initializes and manages the dark mode slider state and persistence.
+         */
+        function initThemeToggle() {
+            const isDark = document.documentElement.classList.contains("dark");
+            darkModeToggle.checked = isDark;
+
+            darkModeToggle.addEventListener("change", () => {
+                const enabled = darkModeToggle.checked;
+                document.documentElement.classList.toggle("dark", enabled);
+                try {
+                    localStorage.setItem("fargo-theme", enabled ? "dark" : "light");
+                } catch (e) {
+                    // Ignore storage errors in restricted environments
+                }
+            });
+        }
+
+        /**
+         * Selects and displays a random quote, ensuring it differs
+         * from the currently displayed quote.
+         */
+        function displayRandomQuote() {
+            try {
+                if (!quotes.length) return;
+
+                let nextIndex;
+                do {
+                    nextIndex = Math.floor(Math.random() * quotes.length);
+                } while (nextIndex === currentIndex && quotes.length > 1);
+
+                currentIndex = nextIndex;
+                const selected = quotes[currentIndex];
+
+                quoteTextEl.textContent = `“${selected.text}”`;
+                quoteAuthorEl.textContent = `— ${selected.author}`;
+            } catch (error) {
+                console.error("Failed to render quote:", error);
+                quoteTextEl.textContent = "Unable to load quote.";
+                quoteAuthorEl.textContent = "";
+            }
+        }
+
+        // Event listener for button interaction
+        newQuoteBtn.addEventListener("click", displayRandomQuote);
+
+        // Initialize theme toggle and display an initial quote on page load
+        window.addEventListener("DOMContentLoaded", () => {
+            initThemeToggle();
+            displayRandomQuote();
+        });
+    </script>
+</body>
+</html>
